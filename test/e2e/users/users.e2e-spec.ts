@@ -51,9 +51,9 @@ describe('UsersController (e2e)', () => {
   it('(GET) /users/:nin - Should return a user', () => getByNin(module, app));
   it('(GET) /users/:nin - Should return 404 not found', () => getByNinNotFound(module, app));
 
-  it('/users (POST) - Should create a user', () => createUserOk(module, app));
-  it('/users (POST) - Should return bad request', () => createUserBadRequest(module, app));
+  it('(POST) /users - Should create a user', () => createUserOk(module, app));
+  it('(POST) /users - Should return bad request', () => createUserBadRequest(module, app));
 
-  it('/users (PUT) - Should update an user', () => updateUserOk(module, app));
-  it('/users (PUT) - Should return bad request', () => updateUserBadRequest(module, app));
+  it('(PUT) /users:nin - Should update an user', () => updateUserOk(module, app));
+  it('(PUT) /users:nin - Should return bad request', () => updateUserBadRequest(module, app));
 });
