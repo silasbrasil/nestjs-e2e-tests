@@ -25,8 +25,8 @@ export class UsersService {
     const arr = await pipeline.exec();
 
     const users = [];
-    for (let i = 0; i < arr.length; i += 2) {
-      const { nin, name, email } = JSON.parse(arr[i][1]);
+    for (const [_, res] of arr) {
+      const { nin, name, email } = JSON.parse(res);
       users.push({ nin, name, email });
     }
 

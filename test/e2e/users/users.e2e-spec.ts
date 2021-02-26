@@ -5,26 +5,26 @@ import { getAll, getByNin, getByNinNotFound } from './gets';
 import { createUserOk, createUserBadRequest } from './posts';
 import { UsersController } from '../../../src/users/users.controller';
 import { UsersService } from '../../../src/users/users.service';
-import { Redis } from 'ioredis';
+import * as Redis from 'ioredis';
 import { updateUserBadRequest, updateUserOk } from './puts';
+
+jest.mock('ioredis');
+const MockRedis = Redis as jest.MockedClass<typeof Redis>;
 
 describe('UsersController (e2e)', () => {
   let module: TestingModule;
   let app: INestApplication;
+  let mockRedis: Redis.Redis;
 
   beforeEach(async () => {
+    MockRedis.prototype.pipeline.mockReturnThis();
+    mockRedis = new MockRedis();
+
     module = await Test.createTestingModule({
       imports: [UsersModule],
     })
       .overrideProvider('RedisConnection')
-      .useValue({
-        set: jest.fn(),
-        get: jest.fn(),
-        del: jest.fn(),
-        keys: jest.fn(),
-        zrevrange: jest.fn(),
-        pipeline: jest.fn(),
-      })
+      .useValue(mockRedis)
       .compile();
 
     app = module.createNestApplication();
@@ -34,7 +34,13 @@ describe('UsersController (e2e)', () => {
   it('Should be instantiated', () => {
     const controller = module.get<UsersController>(UsersController);
     const service = module.get<UsersService>(UsersService);
-    const redis = module.get<Redis>('RedisConnection');
+    const redis = module.get<Redis.Redis>('RedisConnection');
+
+    const pipeline = mockRedis.pipeline();
+
+    expect(pipeline).toBeDefined();
+    expect(pipeline.get).toBeDefined();
+    expect(pipeline.set).toBeDefined();
 
     expect(controller).toBeDefined();
     expect(service).toBeDefined();
